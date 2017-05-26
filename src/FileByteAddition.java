@@ -1,5 +1,4 @@
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.RandomAccessFile;
@@ -36,25 +35,19 @@ public class FileByteAddition {
 
   private static void reverseFile(String file)
       throws IOException {
-    File tmp = new File(file + "_tmp");
-    FileOutputStream tmpFile = new FileOutputStream(tmp);
-    RandomAccessFile rand = new RandomAccessFile(new File(file), "r");
-    long len = rand.length();
-    for (int i = 0; i < len; i++) {
-      rand.seek(len - i - 1);
-      tmpFile.write(rand.readByte());
+    RandomAccessFile rand = new RandomAccessFile(new File(file), "rw");
+    long total = rand.length();
+    for (long i = 0; i < total / 2; i++) {
+      rand.seek(i);
+      byte top = rand.readByte();
+      rand.seek(total - i - 1);
+      byte bottom = rand.readByte();
+      rand.seek(total - i - 1);
+      rand.writeByte(top);
+      rand.seek(i);
+      rand.writeByte(bottom);
     }
     rand.close();
-    tmpFile.close();
-    FileInputStream stream = new FileInputStream(tmp);
-    int available = stream.available();
-    FileOutputStream outStream = new FileOutputStream(file);
-    for (int i = 0; i < available; i++) {
-      outStream.write(stream.read());
-    }
-    stream.close();
-    outStream.close();
-    tmp.delete();
   }
 
   private static int readDigit(RandomAccessFile rand, long byteOffset)
